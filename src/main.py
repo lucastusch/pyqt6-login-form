@@ -1,14 +1,24 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QGridLayout, QVBoxLayout, QLineEdit, QLabel, QPushButton
-from PyQt6.QtGui import QPalette, QColor
+from PyQt6.QtWidgets import QApplication, QWidget, QGridLayout, QMessageBox, QLineEdit, QLabel, QPushButton
+
+
+def set_font(widget):
+    font = widget.font()
+    font.setPointSize(18)
+    widget.setFont(font)
+
+
+def close_gui():
+    app = QApplication(sys.argv)
+    sys.exit(app.exec())
 
 
 class Window(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.name = None
-        self.email = None
+        self.name = str
+        self.email = str
         self.password = str
         self.password_confirm = str
         self.input_name = None
@@ -17,80 +27,102 @@ class Window(QWidget):
         self.button_okay = None
         self.button_cancel = None
         self.input_password_confirm = None
-        self.test()
+        self.add_widgets()
 
-    def test(self):
-        self.setWindowTitle("My App")
+    def check_fields(self, name, email, password, password_confirm):
+        arr = []
 
-        layout = QGridLayout()
-        layout.setContentsMargins(20, 20, 20, 20)
-        self.setLayout(layout)
-
-        # acutal form
-        self.name = QLabel("Name")
-        layout.addWidget(self.name, 1, 0)
-
-        self.email = QLabel("E-Mail")
-        layout.addWidget(self.email, 2, 0)
-
-        self.password = QLabel("Password")
-        layout.addWidget(self.password, 3, 0)
-
-        self.password_confirm = QLabel("Password-Confirm")
-        layout.addWidget(self.password_confirm, 4, 0)
-
-        self.input_name = QLineEdit()
-        layout.addWidget(self.input_name, 1, 1)
-
-        self.input_email = QLineEdit()
-        layout.addWidget(self.input_email, 2, 1)
-
-        self.input_password = QLineEdit()
-        self.input_password.setEchoMode(QLineEdit.EchoMode.Password)
-        layout.addWidget(self.input_password, 3, 1)
-
-        self.input_password_confirm = QLineEdit()
-        self.input_password.setEchoMode(QLineEdit.EchoMode.Password)
-        layout.addWidget(self.input_password_confirm, 4, 1)
-
-        self.button_okay = QPushButton("okay")
-        self.button_okay.clicked.connect(self.show_fields)
-        layout.addWidget(self.button_okay, 5, 1)
-
-        self.button_cancel = QPushButton("cancel")
-        layout.addWidget(self.button_cancel, 6, 1)
-
-    def password_check(self, password, password_confirm):
-        if password == password_confirm:
-            print(f"Password is valid")
-            return True
+        if name != "" and email != "" and password != "" and password == password_confirm:
+            self.display_alert(True, arr)
         else:
-            print(f"Password is invalid")
-            return False
+            if name == "":
+                arr.append("Name is missing")
+            if email == "":
+                arr.append("E-Mail is missing")
+            if password == "":
+                arr.append("Password is missing")
+            if password_confirm == "":
+                arr.append("Confirmed Password is missing")
+            if password != password_confirm:
+                arr.append("Passwords are not matching")
+
+            self.display_alert(False, arr)
+
+    def display_alert(self, check, arr):
+        alert = QMessageBox(self)
+
+        if check:
+            alert.setIcon(QMessageBox.Icon.Information)  # displays info icon
+            alert.setStandardButtons(QMessageBox.StandardButton.Ok)
+            alert.setWindowTitle("confirm-message")
+            alert.setText(f"valid login, congrats")
+        else:
+            alert.setIcon(QMessageBox.Icon.Warning)
+            alert.setStandardButtons(QMessageBox.StandardButton.Retry)
+            alert.setWindowTitle("content-missing-message")
+
+            alert.setText(arr[0])
+
+        alert.exec()
 
     def show_fields(self):
-        arr = []
         name = self.input_name.text()
         email = self.input_email.text()
         password = self.input_password.text()
         password_confirm = self.input_password_confirm.text()
 
-        check = self.password_check(password, password_confirm)
-        if check:
-            arr.append((name, email, password))
-            print(f"{arr}")
-        else:
-            print(f"todo: reload window")
+        self.check_fields(name, email, password, password_confirm)
 
+    def add_widgets(self):
+        self.setWindowTitle("My login-form")
 
-class Color(QWidget):
-    def __init__(self, color):
-        super(Color, self).__init__()
-        self.setAutoFillBackground(True)
+        layout = QGridLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        self.setLayout(layout)
 
-        palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor(color))
-        self.setPalette(palette)
+        self.name = QLabel("Name")
+        set_font(self.name)
+        layout.addWidget(self.name, 1, 0)
+
+        self.email = QLabel("E-Mail")
+        set_font(self.email)
+        layout.addWidget(self.email, 2, 0)
+
+        self.password = QLabel("Password")
+        set_font(self.password)
+        layout.addWidget(self.password, 3, 0)
+
+        self.password_confirm = QLabel("Password-Confirm")
+        set_font(self.password_confirm)
+        layout.addWidget(self.password_confirm, 4, 0)
+
+        self.input_name = QLineEdit()
+        set_font(self.input_name)
+        layout.addWidget(self.input_name, 1, 1)
+
+        self.input_email = QLineEdit()
+        set_font(self.input_email)
+        layout.addWidget(self.input_email, 2, 1)
+
+        self.input_password = QLineEdit()
+        set_font(self.input_password)
+        self.input_password.setEchoMode(QLineEdit.EchoMode.Password)
+        layout.addWidget(self.input_password, 3, 1)
+
+        self.input_password_confirm = QLineEdit()
+        set_font(self.input_password_confirm)
+        self.input_password_confirm.setEchoMode(QLineEdit.EchoMode.Password)
+        layout.addWidget(self.input_password_confirm, 4, 1)
+
+        self.button_okay = QPushButton("okay")
+        set_font(self.button_okay)
+        self.button_okay.clicked.connect(self.show_fields)
+        layout.addWidget(self.button_okay, 5, 1)
+
+        self.button_cancel = QPushButton("cancel")
+        set_font(self.button_cancel)
+        self.button_cancel.clicked.connect(close_gui)
+        layout.addWidget(self.button_cancel, 6, 1)
 
 
 def main():
